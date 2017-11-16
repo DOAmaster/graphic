@@ -1,8 +1,8 @@
-all: project
+all: lab10
 
-project: project.cpp
-	g++ project.cpp -oproject -lX11 -lm
+lab10: lab10.cpp perlin.cpp
+	g++ lab10.cpp perlin.cpp -olab10 -lX11 -lm
 
 clean:
-	rm -f project
+	rm -f lab10
 
