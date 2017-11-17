@@ -410,10 +410,10 @@ void spheres() {
 	o->radius = 100.0;
 	o->surface = SURF_NONE;
 
-  o->inside = false;
-  o->clip[o->nclips].center;
-  vecMake(0.0, 200.0, -100.0, o->clip[o->nclips].center);
-  o->clip[o->nclips].radius = 150.0;
+  	o->inside = false;
+  	o->clip[o->nclips].center;
+  	vecMake(0.0, 200.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 150.0;
  	++o->nclips;
 
 	g.nobjects++;
@@ -429,11 +429,11 @@ void spheres() {
 	o->radius = 100.0;
 	o->surface = SURF_NONE;
 
-  o->inside = true;
-  o->clip[o->nclips].center;
-  vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
-  o->clip[o->nclips].radius = 150.0;
-  ++o->nclips;
+  	o->inside = true;
+	o->clip[o->nclips].center;
+  	vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 150.0;
+  	++o->nclips;
 
 	g.nobjects++;
 
@@ -1320,48 +1320,27 @@ void trace(Ray *ray, Vec rgb, Flt weight, int level)
 			closehit.color[2] = 0.8;
 		}
 	}
- if (o->surface == SURF_NOISE) {
- //perline noise
-  //normalize range
- // float fx = (float)x / g.xres * 24.0;
- // float fy = (float)y / g.yres * 24.0;
- // float v[3] = { fx, fy, 0.0 } ;
-  //pass in x and y to get colors
-    extern float noise3(float vec[3]);
+ 	if (o->surface == SURF_NOISE) {
+    		//perline noise
+    		extern float noise3(float vec[3]);
 
-    float fx = closehit.p[0];
-    float fy = closehit.p[1];
-    float fz = closehit.p[3];
+    		float fx = closehit.p[0];
+    		float fy = closehit.p[1];
+    		float fz = closehit.p[3];
 
-    //somthing wrong here, needs the ray tracer values
-    //float v[3] = { fx, fy, fz };
-
-    float v[3] = { fx, fy, fz }; 
-
-    float ret = noise3(v);
-   // printf("ret = %f \n", ret);
-
-    static float lo = 9e9, hi = -9e9;
-    if ( ret < lo ) {
-        lo = ret;
-    }
-    if ( ret > hi) {
-        hi = ret;
-    }
-
-    ret += fabs(lo);
-    ret /= (fabs(hi - lo));
-
-    //vecNormalize(v);
-    int c = (int)(ret * 255.0);
-    closehit.color[0] = c + 23;
-    closehit.color[1] = c - 23;
-    closehit.color[2] = c + .2;
- // int c = (int)(ret);
-
-
-
- }
+    		float v[3] = { fx, fy, fz }; 
+    		float ret = noise3(v);
+    		static float lo = 9e9, hi = -9e9;
+    		if ( ret < lo) {lo = ret;}
+    		if ( ret > hi) {hi = ret;}
+    		int c = (int)(ret * 255.0);
+    		if (c > 255) {c = 255;}
+    		if (c < 0) {c = 0;} 
+   		// printf("c = %i \n", c);
+    		closehit.color[0] = c + 10;
+    		closehit.color[1] = c;
+    		closehit.color[2] = c;
+ 	}
 	if (o->specular == true) {
 		Vec trgb = {0.0};
 		Ray tray;
