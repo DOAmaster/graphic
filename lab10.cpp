@@ -353,13 +353,13 @@ void pokeball() {
 	//--------------------------------------------------------------------
 	//cylinder black
 	o = &g.object[g.nobjects];
-	o->type = TYPE_CYLINDER;
-	o->inside = true;
-	vecMake(0.0, 100.0, 0.0, o->center);
-	//vecMake(0.0, 0.0, -1.0, o->norm);	
+	o->type = TYPE_DISK;
+	o->inside = false;
+	vecMake(200.0, 200.0, 0.0, o->center);
+	vecMake(0.0, 0.0, -1.0, o->norm);	
 	vecMake(0.0, 0.0, 0.0, o->color);
 
-	o->apex = 30.0;
+	//o->apex = 30.0;
 	o->radius = 100.0;
 	o->surface = SURF_NONE;
 	g.nobjects++;
@@ -449,11 +449,11 @@ void spheres() {
 	o->radius = 100.0;
 	o->surface = SURF_NOISE;
 
-  o->inside = false;
- // o->clip[o->nclips].center;
-  //vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
- // o->clip[o->nclips].radius = 150.0;
- // ++o->nclips;
+ 	 o->inside = false;
+ 	// o->clip[o->nclips].center;
+  	//vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
+ 	// o->clip[o->nclips].radius = 150.0;
+ 	// ++o->nclips;
 
 	g.nobjects++;
 
@@ -461,7 +461,7 @@ void spheres() {
 
 	//--------------------------------------------------------------------
 	//setup light and camera
-  vecMake(.5, .5, .5, g.ambient);
+  	vecMake(.5, .5, .5, g.ambient);
 	vecMake(90.0, 250.0, 200.0, g.lightPos);
 	vecMake(4.0, 200.0, 600.0, g.from);
 	vecMake(0.0, 80.0, 0.0, g.at);
@@ -965,10 +965,18 @@ int rayRingIntersect(Object *o, Ray *ray, Hit *hit)
 	return 0;
 }
 
-void cylinderNormal(Vec p, Vec norm)
+//void sphereNormal(Vec center,Vec hitPoint, Vec norm)
+//void cylinderNormal(Vec p, Vec norm)
+void cylinderNormal(Vec center, Vec hitPoint, Vec norm)
 {
 	//Center of cylinder is at the origin
-	vecMake(p[0], 0.0, p[2], norm);
+//	vecMake(p[0], 0.0, p[2], norm);
+//	vecNormalize(norm);
+
+	//Calc normal at hit
+	norm[0] = hitPoint[0] - center[0];
+	norm[1] = hitPoint[1] - center[1];
+	norm[2] = hitPoint[2] - center[2];
 	vecNormalize(norm);
 }
 
@@ -1278,7 +1286,8 @@ void trace(Ray *ray, Vec rgb, Flt weight, int level)
 						closehit.t = hit.t;
 						vecCopy(hit.p, closehit.p);
 						vecCopy(o->color, closehit.color);
-						cylinderNormal(closehit.p, closehit.norm);
+						//cylinderNormal(closehit.p, closehit.norm);
+						cylinderNormal(o->center, closehit.p, closehit.norm);
 						if (o->inside)
 							vecNegate(closehit.norm);
 						h=i;
