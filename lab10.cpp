@@ -334,7 +334,7 @@ void pokeball() {
 	//sphere 2 top red
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 150.0, -200.0, o->center);
+	vecMake(0.0, 125.0, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(1,0,0, o->color);
@@ -349,24 +349,63 @@ void pokeball() {
   	++o->nclips;
 
 	g.nobjects++;
-
-	//--------------------------------------------------------------------
-	//cylinder black
+  
+	//-------------------------------------------------------------------  
+	//sphere cornell box left red
 	o = &g.object[g.nobjects];
-	o->type = TYPE_DISK;
-	o->inside = false;
-	vecMake(200.0, 200.0, 0.0, o->center);
-	vecMake(0.0, 0.0, -1.0, o->norm);	
-	vecMake(0.0, 0.0, 0.0, o->color);
-
-	//o->apex = 30.0;
-	o->radius = 100.0;
+	o->type = TYPE_SPHERE;
+	vecMake(-10300.0, 0.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(1,0,0, o->color);
+	o->radius = 10000.0;
 	o->surface = SURF_NONE;
-	g.nobjects++;
 
+	g.nobjects++;
   
 	//--------------------------------------------------------------------
 
+	//sphere cornell box right green
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(10300.0, 0.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(0,1,0, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
+
+	//sphere cornell box top whiteish
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(0.0, 10300.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(.7,.7,.7, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
+
+	//sphere cornell box top whiteish
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(0.0, 0.0, -10500.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(.7,.7,.7, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
 	//setup light and camera
 	vecMake(90.0, 150.0, 500.0, g.lightPos);
 	vecMake(4.0, 200.0, 1100.0, g.from);
@@ -603,6 +642,7 @@ int checkKeys(XEvent *e)
         		showMenu();
     		}
 		if (key == XK_r) {
+      g.mode = 3;
 			init();
 			render(PERSPECTIVE);
 			return 0;
@@ -631,9 +671,9 @@ int checkKeys(XEvent *e)
 			return 0;
 		}
 		if (key == XK_4) {
-      			g.mode = 4;
-			init();
-			render(PERSPECTIVE);
+     // 			g.mode = 4;
+		//	init();
+		//	render(PERSPECTIVE);
 			return 0;
 		}
 		if (key == XK_Escape) {
