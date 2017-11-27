@@ -1,9 +1,6 @@
 //modified by: Derrick Alden
-//
 //3480 Computer Graphics
-//lab10.cpp
 //Author: Gordon Griesel
-//Date: 2017
 //This is a perspective ray tracer.
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +30,7 @@ enum {
 	PERSPECTIVE,
 	SURF_NONE,
 	SURF_CHECKER,
-  SURF_NOISE
+  	SURF_NOISE
 };
 
 //Ray tracing structures
@@ -311,6 +308,7 @@ void pokeball() {
 	g.nobjects++;
 	//--------------------------------------------------------------------
 	//sphere 1 bottom white
+	/*
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
 	vecMake(0.0, 100.0, -200.0, o->center);
@@ -329,7 +327,7 @@ void pokeball() {
   	++o->nclips;
 
 	g.nobjects++;
-
+	*/
 	//-------------------------------------------------------------------  
 	//sphere 2 top red
 	o = &g.object[g.nobjects];
@@ -343,13 +341,25 @@ void pokeball() {
 
 	//cut into top sphere
   	o->inside = false;
-  	o->clip[o->nclips].center;
-  	vecMake(0.0, 100.0,-200.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 100.0;
+	//clipping center
+  	vecMake(0.0, 25.0, -200.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
-
 	g.nobjects++;
-  
+
+	//--------------------------------------------------------------------
+	//ring around pokeball black
+//	o = &g.object[g.nobjects];
+//	o->type = TYPE_DISK;
+//	vecMake(0.0, 50.0, 0.0, o->center);
+//	vecMake(0.0, 1.0, 0.0, o->norm);
+//	o->radius = 100.0;
+	//o->specular = true;
+	//vecMake(0.2, 0.2, 0.2, o->spec);
+//	vecMake(0.5, 0.5, 0.5, o->color);
+//	o->surface = SURF_NONE;
+//	vecNormalize(o->norm);
+//	g.nobjects++;
 	//-------------------------------------------------------------------  
 	//sphere cornell box left red
 	o = &g.object[g.nobjects];
@@ -759,7 +769,7 @@ bool pointInTriangle(Vec tri[3], Vec p, Flt *u, Flt *v)
 }
 
 
-int rayPlaneIntersect(Vec center, Vec normal, Ray *ray, Hit *hit)
+int rayPlaneIntersect(Vec center, Vec normal, Ray *ray, Hit *hit, Object *o)
 {
 	//http://mathworld.wolfram.com/Plane.html
 	//
@@ -816,6 +826,25 @@ int rayPlaneIntersect(Vec center, Vec normal, Ray *ray, Hit *hit)
 	hit->p[2] = ray->o[2] + hit->t * ray->d[2];
 
 
+    if(o->nclips) {
+        for(int i=0; i<o->nclips; i++) {
+          Vec v;
+          vecSub(hit->p,o->clip[i].center,v);
+          Flt len = vecLength(v);
+	  //check if radius is 0 then clip with plane
+	  //-----------------------------------------
+	  if (vecDotProduct(v, o->clip[i].normal) > 0.0) {
+	    return 0;
+	  }
+	  //----------------------------------------
+          if ( len < o->clip[i].radius && !o->clip[i].inside){
+            return 1;
+          }
+          if ( len > o->clip[i].radius && o->clip[i].inside){
+            return 1;
+          }
+        }
+    }
 
 	return 1;
 }
@@ -835,7 +864,7 @@ int rayDiskIntersect(Object *o, Ray *ray, Hit *hit)
         }
     }
 	
-	if (rayPlaneIntersect(o->center, o->norm, ray, hit)) {
+	if (rayPlaneIntersect(o->center, o->norm, ray, hit, o)) {
 		//Yes.
 		//Check that the hit point is within the disk radius
 		//Use the point hit instead of the ray origin
@@ -993,7 +1022,7 @@ void reflect(Vec I, Vec N, Vec R)
 
 int rayRingIntersect(Object *o, Ray *ray, Hit *hit)
 {
-	if (rayPlaneIntersect(o->center, o->norm, ray, hit)) {
+	if (rayPlaneIntersect(o->center, o->norm, ray, hit, o)) {
 		Flt d0 = o->center[0] - hit->p[0];
 		Flt d1 = o->center[1] - hit->p[1];
 		Flt d2 = o->center[2] - hit->p[2];
