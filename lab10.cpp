@@ -331,10 +331,10 @@ void pokeball() {
 	
 	//-------------------------------------------------------------------  
 	//sphere 2 top red
-	/*
+	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 125.0, -200.0, o->center);
+	vecMake(0.0, 200.0, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(1,0,0, o->color);
@@ -344,21 +344,23 @@ void pokeball() {
 	//cut into top sphere
   	o->inside = false;
 	//clipping center
-  	vecMake(0.0, 25.0, -200.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 200.0, -200.0, o->clip[o->nclips].center);
+	vecMake(0.0, -1.0, 0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
 	g.nobjects++;
 
 	//cut sphere into sphere
-  	o->inside = false;
+  	//o->inside = false;
 	//clipping center
-  	vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 25.0;
-  	++o->nclips;
+  	//vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
+  	//o->clip[o->nclips].radius = 25.0;
+  	//++o->nclips;
 
 	g.nobjects++;
 	//-------------------------------------------------------------------  
 	//sphere 3 inside black
+	/*
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
 	vecMake(0.0, 125.0, -200.0, o->center);
@@ -379,7 +381,6 @@ void pokeball() {
 */
 	//--------------------------------------------------------------------
 	//--------------------------------------------------------------------
-	//ring around pokeball black
 //	o = &g.object[g.nobjects];
 //	o->type = TYPE_DISK;
 //	vecMake(0.0, 50.0, 0.0, o->center);
@@ -388,9 +389,6 @@ void pokeball() {
 	//o->specular = true;
 	//vecMake(0.2, 0.2, 0.2, o->spec);
 //	vecMake(0.5, 0.5, 0.5, o->color);
-//	o->surface = SURF_NONE;
-//	vecNormalize(o->norm);
-//	g.nobjects++;
 	//-------------------------------------------------------------------  
 	//sphere cornell box left red
 	o = &g.object[g.nobjects];
