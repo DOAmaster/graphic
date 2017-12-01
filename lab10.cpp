@@ -308,7 +308,7 @@ void pokeball() {
 	g.nobjects++;
 	//--------------------------------------------------------------------
 	//sphere 1 bottom white
-	/*
+	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
 	vecMake(0.0, 100.0, -200.0, o->center);
@@ -322,14 +322,16 @@ void pokeball() {
 	//clip sphere about half
   	o->inside = true;
   	//o->clip[o->nclips].center;
-  	vecMake(0.0, 200.0, -200.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 100.0;
+  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
+	vecMake(0.0,1.0,0.0, o->clip[o->nclips].normal);
+  	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
 
 	g.nobjects++;
-	*/
+	
 	//-------------------------------------------------------------------  
 	//sphere 2 top red
+	/*
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
 	vecMake(0.0, 125.0, -200.0, o->center);
@@ -347,6 +349,35 @@ void pokeball() {
   	++o->nclips;
 	g.nobjects++;
 
+	//cut sphere into sphere
+  	o->inside = false;
+	//clipping center
+  	vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 25.0;
+  	++o->nclips;
+
+	g.nobjects++;
+	//-------------------------------------------------------------------  
+	//sphere 3 inside black
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(0.0, 125.0, -200.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(0,0,0, o->color);
+	o->radius = 90.0;
+	o->surface = SURF_NONE;
+
+	//cut sphere into sphere
+  //	o->inside = false;
+	//clipping center
+  //	vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
+  //	o->clip[o->nclips].radius = 25.0;
+  //	++o->nclips;
+
+	g.nobjects++;
+*/
+	//--------------------------------------------------------------------
 	//--------------------------------------------------------------------
 	//ring around pokeball black
 //	o = &g.object[g.nobjects];
@@ -826,25 +857,6 @@ int rayPlaneIntersect(Vec center, Vec normal, Ray *ray, Hit *hit, Object *o)
 	hit->p[2] = ray->o[2] + hit->t * ray->d[2];
 
 
-    if(o->nclips) {
-        for(int i=0; i<o->nclips; i++) {
-          Vec v;
-          vecSub(hit->p,o->clip[i].center,v);
-          Flt len = vecLength(v);
-	  //check if radius is 0 then clip with plane
-	  //-----------------------------------------
-	  if (vecDotProduct(v, o->clip[i].normal) > 0.0) {
-	    return 0;
-	  }
-	  //----------------------------------------
-          if ( len < o->clip[i].radius && !o->clip[i].inside){
-            return 1;
-          }
-          if ( len > o->clip[i].radius && o->clip[i].inside){
-            return 1;
-          }
-        }
-    }
 
 	return 1;
 }
@@ -966,9 +978,22 @@ int raySphereIntersect(Object *o, Ray *ray, Hit *hit)
 
     if(o->nclips) {
         for(int i=0; i<o->nclips; i++) {
-          Vec v;
-          vecSub(hit->p,o->clip[i].center,v);
-          Flt len = vecLength(v);
+
+	  //check if radius is 0 then clip with plane
+	  //-----------------------------------------
+	  if (o->clip[i].radius == 0) {
+	         Vec v;
+          	vecSub(hit->p,o->clip[i].center,v);
+		if(vecDotProduct(v, o->clip[i].normal) > 0.0) {
+		    goto sp_hit2;
+		}
+	  } else {
+	    	Vec v;
+          	vecSub(hit->p,o->clip[i].center,v);
+		Flt len = vecLength(v);
+
+	  //----------------------------------------
+        
           if ( len < o->clip[i].radius && !o->clip[i].inside){
             goto sp_hit2;
           }
@@ -976,6 +1001,8 @@ int raySphereIntersect(Object *o, Ray *ray, Hit *hit)
             goto sp_hit2;
           }
         }
+	}
+
     }
 
 		return 1;
@@ -993,16 +1020,29 @@ sp_hit2:
 
     if(o->nclips) {
         for(int i=0; i<o->nclips; i++) {
-          Vec v;
-          vecSub(hit->p,o->clip[i].center,v);
-          Flt len = vecLength(v);
+	  //check if radius is 0 then clip with plane
+	  //-----------------------------------------
+	  if (o->clip[i].radius == 0) {
+	         Vec v;
+          	vecSub(hit->p,o->clip[i].center,v);
+		if(vecDotProduct(v, o->clip[i].normal) > 0.0) {
+		    return 0;
+		}
+	  } else {
+	    	Vec v;
+          	vecSub(hit->p,o->clip[i].center,v);
+		Flt len = vecLength(v);
+
+	  //----------------------------------------
+        
           if ( len < o->clip[i].radius && !o->clip[i].inside){
-            return 1;
+            return 0;
           }
           if ( len > o->clip[i].radius && o->clip[i].inside){
-            return 1;
+            return 0;
           }
         }
+	}
     }
 		return 1;
 	}
