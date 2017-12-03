@@ -321,10 +321,15 @@ void pokeball() {
 
 	//clip sphere about half
   	o->inside = true;
-  	//o->clip[o->nclips].center;
   	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
 	vecMake(0.0,1.0,0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
+  	++o->nclips;
+
+//	cut sphere into sphere
+  	o->inside = false;
+  	vecMake(0.0, 125.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 45.0;
   	++o->nclips;
 
 	g.nobjects++;
@@ -348,14 +353,12 @@ void pokeball() {
 	vecMake(0.0, -1.0, 0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
-	g.nobjects++;
 
-	//cut sphere into sphere
-  	//o->inside = false;
-	//clipping center
-  	//vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
-  	//o->clip[o->nclips].radius = 25.0;
-  	//++o->nclips;
+//	cut sphere into sphere
+  	o->inside = false;
+  	vecMake(0.0, 175.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 45.0;
+  	++o->nclips;
 
 	g.nobjects++;
 	//-------------------------------------------------------------------  
