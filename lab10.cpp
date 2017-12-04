@@ -113,8 +113,8 @@ class Global {
 		Flt botY;
 		Flt ringX;
 		Global() {
-			topY = 100.0;
-			topY = 100.0;
+			topY = 150.0;
+			botY = 150.0;
 			ringX = 0.0; 
 			srand((unsigned)time(NULL));
 			xres = 640, yres = 480;
@@ -526,7 +526,7 @@ void newinit() {
 
 	//clip sphere about half
   	o->inside = true;
-  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
+  	vecMake(0.0, g.botY, -200.0, o->clip[o->nclips].center);
 	vecMake(0.0,1.0,0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
@@ -562,7 +562,7 @@ void newinit() {
 
 //	cut sphere into sphere
   	o->inside = false;
-  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	vecMake(0.0, g.topY, -100.0, o->clip[o->nclips].center);
   	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
@@ -572,7 +572,7 @@ void newinit() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(g.ringX, 100.0, -200.0, o->center);
+	vecMake(g.ringX, 150.0, -200.0, o->center);
 //	o->specular = true;
 //	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(0,0,0, o->color);
@@ -593,7 +593,7 @@ void newinit() {
 	//Disk 1 button white
 	o = &g.object[g.nobjects];
 	o->type = TYPE_DISK;
-	vecMake(0.0, 100.0, -100.0, o->center);
+	vecMake(0.0, 150.0, -100.0, o->center);
 	vecMake(0.0, 0.0, 1.0, o->norm);
 	o->radius = 20.0;
 	o->specular = true;
@@ -786,8 +786,21 @@ void animation(int nframes) {
 		//take screenshot
 		takeScreenshot("", "", 0);
 		//move objects using globals
+                if(g.topY <= 200) {
+                       g.topY += 10;
+                }
+                if(g.topY >= 200) {
+                       g.topY -= 10;
+                }
+                if(g.botY >= 100) {
+                       g.botY -= 10;
+                }
+                if(g.botY <= 100) {
+                       g.botY += 10;
+                }
+                
 	}
-	system("conver -delay 10 -loop 0 *.jpg animation.gif");
+	system("convert -delay 10 -loop 0 *.jpg animation.gif");
 
 }
 
