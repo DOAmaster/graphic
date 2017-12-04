@@ -328,8 +328,8 @@ void pokeball() {
 
 //	cut sphere into sphere
   	o->inside = false;
-  	vecMake(0.0, 125.0, -100.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 45.0;
+  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
 	g.nobjects++;
@@ -339,7 +339,7 @@ void pokeball() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 200.0, -200.0, o->center);
+	vecMake(0.0, 100.0, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(1,0,0, o->color);
@@ -349,28 +349,28 @@ void pokeball() {
 	//cut into top sphere
   	o->inside = false;
 	//clipping center
-  	vecMake(0.0, 200.0, -200.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
 	vecMake(0.0, -1.0, 0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
 
 //	cut sphere into sphere
   	o->inside = false;
-  	vecMake(0.0, 175.0, -100.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 45.0;
+  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
 	g.nobjects++;
 	//-------------------------------------------------------------------  
 	//sphere 3 inside black
-	/*
+	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
 	vecMake(0.0, 125.0, -200.0, o->center);
 //	o->specular = true;
 //	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(0,0,0, o->color);
-	o->radius = 90.0;
+	o->radius = 75.0;
 	o->surface = SURF_NONE;
 
 	//cut sphere into sphere
@@ -381,7 +381,7 @@ void pokeball() {
   //	++o->nclips;
 
 	g.nobjects++;
-*/
+
 	//--------------------------------------------------------------------
 	//--------------------------------------------------------------------
 //	o = &g.object[g.nobjects];
