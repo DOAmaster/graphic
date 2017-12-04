@@ -8,6 +8,8 @@
 #include <math.h>
 #include <time.h>
 #include <X11/Xlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 
@@ -107,7 +109,13 @@ class Global {
 		Vec lightPos;
 		Vec from, at, up;
 		Flt angle;
+		Flt topY;
+		Flt botY;
+		Flt ringX;
 		Global() {
+			topY = 100.0;
+			topY = 100.0;
+			ringX = 0.0; 
 			srand((unsigned)time(NULL));
 			xres = 640, yres = 480;
 			mode = 0;
@@ -248,10 +256,11 @@ int main(void)
 	return 0;
 }
 
-void takeScreenshot(const char *filename, int reset)
+void takeScreenshot(const char *path, const char *filename, int reset)
 {
 	//This function will capture your current X11 window,
 	//and save it to a PPM P6 image file.
+	//The ppm is then converted to a jpeg.
 	//File names are generated sequentially.
 	static int picnum = 0;
 	int x,y;
@@ -260,15 +269,26 @@ void takeScreenshot(const char *filename, int reset)
 	if (reset)
 		picnum = 0;
 	XImage *image = x11.getImage(width, height);
-	//
+	//blank path is ok.
+	char lpath[256];
+	strcpy(lpath, path);
+	int slen = strlen(lpath);
+	if (slen > 0 && lpath[slen-1] != '/') {
+		mkdir(lpath,0700);
+		strcat(lpath, "/");
+	}
 	//If filename argument is empty, generate a sequential filename...
-	char ts[256] = "";
-	strcpy(ts, filename);
-	if (ts[0] == '\0') {
-		sprintf(ts,"./lab5%02i.ppm", picnum);
+	char ppmname[256] = "";
+	strcpy(ppmname, filename);
+	if (ppmname[0] == '\0') {
+		sprintf(ppmname, "./%spic%03i.ppm", path, picnum);
+		while (access(ppmname, F_OK) == 0) {
+			picnum++;
+			sprintf(ppmname, "./%spic%03i.ppm", path, picnum);
+		}
 		picnum++;
 	}
-	FILE *fpo = fopen(ts, "w");
+	FILE *fpo = fopen(ppmname, "w");
 	if (fpo) {
 		fprintf(fpo, "P6\n%i %i\n255\n", width, height);
 		for (y=0; y<height; y++) {
@@ -280,6 +300,13 @@ void takeScreenshot(const char *filename, int reset)
 			}
 		}
 		fclose(fpo);
+		char jpgname[256] = "";
+		sprintf(jpgname,"./%spic%02i.jpg", lpath, picnum);
+		char ts[256];
+		sprintf(ts, "convert %s -quality 100 %s", ppmname, jpgname);
+		system(ts);
+		printf("takeScreenshot(%s)\n", jpgname);
+		unlink(ppmname);
 	}
 	XFree(image);
 }
@@ -345,6 +372,7 @@ void pokeball() {
 	vecMake(1,0,0, o->color);
 	o->radius = 100.0;
 	o->surface = SURF_NONE;
+	vecMake(0.0, 1.0, 0.0, o->norm);
 
 	//cut into top sphere
   	o->inside = false;
@@ -366,11 +394,12 @@ void pokeball() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 125.0, -200.0, o->center);
+	vecMake(0.0, 100.0, -200.0, o->center);
 //	o->specular = true;
 //	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(0,0,0, o->color);
-	o->radius = 75.0;
+	//100 might be too big
+	o->radius = 90.0;
 	o->surface = SURF_NONE;
 
 	//cut sphere into sphere
@@ -383,15 +412,18 @@ void pokeball() {
 	g.nobjects++;
 
 	//--------------------------------------------------------------------
-	//--------------------------------------------------------------------
-//	o = &g.object[g.nobjects];
-//	o->type = TYPE_DISK;
-//	vecMake(0.0, 50.0, 0.0, o->center);
-//	vecMake(0.0, 1.0, 0.0, o->norm);
-//	o->radius = 100.0;
-	//o->specular = true;
-	//vecMake(0.2, 0.2, 0.2, o->spec);
-//	vecMake(0.5, 0.5, 0.5, o->color);
+	//Disk 1 button white
+	o = &g.object[g.nobjects];
+	o->type = TYPE_DISK;
+	vecMake(0.0, 100.0, -100.0, o->center);
+	vecMake(0.0, 0.0, 1.0, o->norm);
+	o->radius = 20.0;
+	o->specular = true;
+	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(1.0, 1.0, 1.0, o->color);
+
+	g.nobjects++;
+
 	//-------------------------------------------------------------------  
 	//sphere cornell box left red
 	o = &g.object[g.nobjects];
@@ -457,12 +489,11 @@ void pokeball() {
 
 }
 
-void spheres() {
-
+//init for pokeball
+void newinit() {
 	//Setup some objects
 	Object *o;
 	g.nobjects=0;
-
 
   	o->clip->clear();
 	o->clear_clips();
@@ -481,76 +512,158 @@ void spheres() {
 	vecNormalize(o->norm);
 	g.nobjects++;
 	//--------------------------------------------------------------------
-	//sphere 1 sitting on floor
+	//sphere 1 bottom white
+	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 100.0, -200.0, o->center);
+	vecMake(0.0, g.botY, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
-	vecMake(.9,.7,.2, o->color);
+	vecMake(1,1,1, o->color);
 	o->radius = 100.0;
 	o->surface = SURF_NONE;
 
-  	o->inside = false;
-  	o->clip[o->nclips].center;
-  	vecMake(0.0, 200.0, -100.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 150.0;
- 	++o->nclips;
 
-	g.nobjects++;
-
-	//--------------------------------------------------------------------
-	//sphere 2 clipping 
- 	o = &g.object[g.nobjects];
-	o->type = TYPE_SPHERE;
-	vecMake(0.0, 100.0, -200.0, o->center);
-	o->specular = true;
-	vecMake(0.5, 0.5, 0.5, o->spec);
-	vecMake(.9,.7,.2, o->color);
-	o->radius = 100.0;
-	o->surface = SURF_NONE;
-
+	//clip sphere about half
   	o->inside = true;
-	o->clip[o->nclips].center;
-  	vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
-  	o->clip[o->nclips].radius = 150.0;
+  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
+	vecMake(0.0,1.0,0.0, o->clip[o->nclips].normal);
+  	o->clip[o->nclips].radius = 0.0;
+  	++o->nclips;
+
+//	cut sphere into sphere
+  	o->inside = false;
+  	vecMake(0.0, g.botY, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
 	g.nobjects++;
-
-  //--------------------------------------------------------------------
-
-	//sphere 3 noise 
- 	o = &g.object[g.nobjects];
+	
+	//-------------------------------------------------------------------  
+	//sphere 2 top red
+	
+	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(-150.0, 200.0, -200.0, o->center);
+	vecMake(0.0, g.topY, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
-	vecMake(.9,.7,.2, o->color);
+	vecMake(1,0,0, o->color);
 	o->radius = 100.0;
-	o->surface = SURF_NOISE;
+	o->surface = SURF_NONE;
+	vecMake(0.0, 1.0, 0.0, o->norm);
 
- 	 o->inside = false;
- 	// o->clip[o->nclips].center;
-  	//vecMake(0.0, 200.0,-100.0, o->clip[o->nclips].center);
- 	// o->clip[o->nclips].radius = 150.0;
- 	// ++o->nclips;
+	//cut into top sphere
+  	o->inside = false;
+	//clipping center
+  	vecMake(0.0, g.topY, -200.0, o->clip[o->nclips].center);
+	vecMake(0.0, -1.0, 0.0, o->clip[o->nclips].normal);
+  	o->clip[o->nclips].radius = 0.0;
+  	++o->nclips;
+
+//	cut sphere into sphere
+  	o->inside = false;
+  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	o->clip[o->nclips].radius = 27.0;
+  	++o->nclips;
+
+	g.nobjects++;
+	//-------------------------------------------------------------------  
+	//sphere 3 inside black
+	
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(g.ringX, 100.0, -200.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(0,0,0, o->color);
+	//100 might be too big
+	o->radius = 90.0;
+	o->surface = SURF_NONE;
+
+	//cut sphere into sphere
+  //	o->inside = false;
+	//clipping center
+  //	vecMake(0.0, 140.0, -100.0, o->clip[o->nclips].center);
+  //	o->clip[o->nclips].radius = 25.0;
+  //	++o->nclips;
 
 	g.nobjects++;
 
-  //--------------------------------------------------------------------
+	//--------------------------------------------------------------------
+	//Disk 1 button white
+	o = &g.object[g.nobjects];
+	o->type = TYPE_DISK;
+	vecMake(0.0, 100.0, -100.0, o->center);
+	vecMake(0.0, 0.0, 1.0, o->norm);
+	o->radius = 20.0;
+	o->specular = true;
+	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(1.0, 1.0, 1.0, o->color);
 
+	g.nobjects++;
+
+	//-------------------------------------------------------------------  
+	//sphere cornell box left red
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(-10300.0, 0.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(1,0,0, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
+
+	//sphere cornell box right green
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(10300.0, 0.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(0,1,0, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
+
+	//sphere cornell box top whiteish
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(0.0, 10300.0, 0.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(.7,.7,.7, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
+	//--------------------------------------------------------------------
+
+	//sphere cornell box top whiteish
+	o = &g.object[g.nobjects];
+	o->type = TYPE_SPHERE;
+	vecMake(0.0, 0.0, -10500.0, o->center);
+//	o->specular = true;
+//	vecMake(0.5, 0.5, 0.5, o->spec);
+	vecMake(.7,.7,.7, o->color);
+	o->radius = 10000.0;
+	o->surface = SURF_NONE;
+
+	g.nobjects++;
+  
 	//--------------------------------------------------------------------
 	//setup light and camera
-  	vecMake(.5, .5, .5, g.ambient);
-	vecMake(90.0, 250.0, 200.0, g.lightPos);
-	vecMake(4.0, 200.0, 600.0, g.from);
-	vecMake(0.0, 80.0, 0.0, g.at);
+	vecMake(90.0, 150.0, 500.0, g.lightPos);
+	vecMake(4.0, 200.0, 1100.0, g.from);
+	vecMake(0.0, 180.0, 0.0, g.at);
 	vecMake(0.0, 1.0, 0.0, g.up);
-	g.angle = 45.0;
-  
-
-   
+	g.angle = 30.0;
 
 }
 
@@ -564,9 +677,6 @@ void init(void)
   }
   if (g.mode == 3) {
       pokeball();
-  }
-  if (g.mode == 4) {
-      spheres();
   }
 
 }
@@ -668,6 +778,21 @@ void showMenu()
 	y += inc;
 }
 
+void animation(int nframes) {
+	for (int i=0; i<nframes; i++) {
+		newinit();
+		//call render
+		render(PERSPECTIVE);
+		//take screenshot
+		takeScreenshot("", "", 0);
+		//move objects using globals
+	}
+	system("conver -delay 10 -loop 0 *.jpg animation.gif");
+
+}
+
+
+
 int checkKeys(XEvent *e)
 {
 	if (e->type == KeyPress) {
@@ -677,14 +802,17 @@ int checkKeys(XEvent *e)
 			return 0;
 		}
 		if (key == XK_a) {
-			takeScreenshot("", 0);
+			takeScreenshot("", "", 0);
 			return 0;
 		}
     		if (key == XK_m) {
         		showMenu();
     		}
+		if (key == XK_z) {
+			animation(30);
+		}
 		if (key == XK_r) {
-      g.mode = 3;
+      			g.mode = 3;
 			init();
 			render(PERSPECTIVE);
 			return 0;
