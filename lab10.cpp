@@ -338,7 +338,7 @@ void pokeball() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 100.0, -200.0, o->center);
+	vecMake(0.0, 105.0, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(1,1,1, o->color);
@@ -348,14 +348,14 @@ void pokeball() {
 
 	//clip sphere about half
   	o->inside = true;
-  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 105.0, -200.0, o->clip[o->nclips].center);
 	vecMake(0.0,1.0,0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
 
 //	cut sphere into sphere
   	o->inside = false;
-  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 110.0, -100.0, o->clip[o->nclips].center);
   	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
@@ -366,7 +366,7 @@ void pokeball() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 100.0, -200.0, o->center);
+	vecMake(0.0, 115.0, -200.0, o->center);
 	o->specular = true;
 	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(1,0,0, o->color);
@@ -377,14 +377,14 @@ void pokeball() {
 	//cut into top sphere
   	o->inside = false;
 	//clipping center
-  	vecMake(0.0, 100.0, -200.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 115.0, -200.0, o->clip[o->nclips].center);
 	vecMake(0.0, -1.0, 0.0, o->clip[o->nclips].normal);
   	o->clip[o->nclips].radius = 0.0;
   	++o->nclips;
 
 //	cut sphere into sphere
   	o->inside = false;
-  	vecMake(0.0, 100.0, -100.0, o->clip[o->nclips].center);
+  	vecMake(0.0, 110.0, -100.0, o->clip[o->nclips].center);
   	o->clip[o->nclips].radius = 27.0;
   	++o->nclips;
 
@@ -394,12 +394,12 @@ void pokeball() {
 	
 	o = &g.object[g.nobjects];
 	o->type = TYPE_SPHERE;
-	vecMake(0.0, 100.0, -200.0, o->center);
+	vecMake(0.0, 110.0, -200.0, o->center);
 //	o->specular = true;
 //	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(0,0,0, o->color);
 	//100 might be too big
-	o->radius = 90.0;
+	o->radius = 99.0;
 	o->surface = SURF_NONE;
 
 	//cut sphere into sphere
@@ -415,7 +415,7 @@ void pokeball() {
 	//Disk 1 button white
 	o = &g.object[g.nobjects];
 	o->type = TYPE_DISK;
-	vecMake(0.0, 100.0, -100.0, o->center);
+	vecMake(0.0, 110.0, -100.0, o->center);
 	vecMake(0.0, 0.0, 1.0, o->norm);
 	o->radius = 20.0;
 	o->specular = true;
