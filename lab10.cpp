@@ -399,7 +399,7 @@ void pokeball() {
 //	vecMake(0.5, 0.5, 0.5, o->spec);
 	vecMake(0,0,0, o->color);
 	//100 might be too big
-	o->radius = 99.0;
+	o->radius = 99.9;
 	o->surface = SURF_NONE;
 
 	//cut sphere into sphere
